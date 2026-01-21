@@ -26,6 +26,10 @@ interface TradeDao {
     @Query("SELECT * FROM trades ORDER BY openedAtMs DESC LIMIT 200")
     fun flowTrades(): Flow<List<TradeEntity>>
 
+    // "التوصيات الناجحة": صفقات مغلقة وربحها > 0
+    @Query("SELECT * FROM trades WHERE realizedPnlUsdt IS NOT NULL AND realizedPnlUsdt > 0 AND state IN ('TP2','CLOSED') ORDER BY closedAtMs DESC LIMIT 300")
+    fun flowSuccessfulClosedTrades(): Flow<List<TradeEntity>>
+
     @Query("SELECT COUNT(*) FROM trades WHERE state IN ('RUNNING','TP1')")
     suspend fun countOpen(): Int
 

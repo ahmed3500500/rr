@@ -25,7 +25,8 @@ import com.proq.cryptosignals.data.repository.dashboardSummaryFlow
 fun DashboardScreen(
     onOpenSignals: () -> Unit,
     onOpenSettings: () -> Unit,
-    onOpenBacktest: () -> Unit
+    onOpenBacktest: () -> Unit,
+    onOpenWinners: () -> Unit
 ) {
     val graph = LocalAppGraph.current
     val repo = graph.signalRepository
@@ -60,7 +61,11 @@ fun DashboardScreen(
                 Button(onClick = onOpenSignals, modifier = Modifier.weight(1f)) { Text("التوصيات") }
                 Button(onClick = onOpenBacktest, modifier = Modifier.weight(1f)) { Text("باكتيست") }
             }
-            Button(onClick = onOpenSettings, modifier = Modifier.align(Alignment.End)) { Text("الإعدادات") }
+            Spacer(Modifier.height(2.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Button(onClick = onOpenWinners, modifier = Modifier.weight(1f)) { Text("الناجحة") }
+                Button(onClick = onOpenSettings, modifier = Modifier.weight(1f)) { Text("الإعدادات") }
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.proq.cryptosignals.di.AppGraph
+import com.proq.cryptosignals.util.SuccessLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -17,6 +18,7 @@ class TradeMonitorWorker(
         val repo = graph.signalRepository
         val binance = graph.binanceRepository
         val notifier = graph.notifier
+        val successLogger = SuccessLogger(applicationContext)
 
         try {
             val active = repo.getActiveTrades()
@@ -35,6 +37,11 @@ class TradeMonitorWorker(
                 if (hitTp2) {
                     repo.closeTrade(t.id, "TP2", pnl, pct)
                     notifier.notifyPnl("تحقق الهدف TP2 ✅ ${t.symbol}", "الربح التقريبي: ${fmt(pnl)} USDT (${fmt(pct)}%)\nالسعر: ${fmt(price)}")
+                    if (pnl > 0) {
+                        successLogger.logSuccessLine(
+                            "${t.symbol} | ${t.side} | Entry=${fmt(t.entryPrice)} | TP2=${fmt(t.tp2)} | PNL=${fmt(pnl)}USDT | (${fmt(pct)}%)"
+                        )
+                    }
                 } else if (hitSl) {
                     repo.closeTrade(t.id, "SL", pnl, pct)
                     notifier.notifyPnl("تم ضرب وقف الخسارة ⛔ ${t.symbol}", "النتيجة التقريبية: ${fmt(pnl)} USDT (${fmt(pct)}%)\nالسعر: ${fmt(price)}")

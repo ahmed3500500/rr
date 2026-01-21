@@ -31,20 +31,22 @@ class SignalScanWorker(
             val params = StrategyParams.default().copy(minScore = minScore)
             val engine = StrategyEngine()
 
-            val symbols = binance.getTopUsdtSymbols(limit = 35)
+            // Keep the scan "قليل لكن قوي" and avoid API bans (fewer symbols = fewer requests)
+            val symbols = binance.getTopUsdtSymbols(limit = 22)
 
             for (symbol in symbols) {
                 if (repo.isInCooldown(symbol, 120)) continue
+                try {
+                    val live = binance.getLivePrice(symbol)
+                    val now = System.currentTimeMillis()
+                    repo.upsertPriceCache(symbol, live, now)
 
-                val live = binance.getLivePrice(symbol)
-                val now = System.currentTimeMillis()
-                repo.upsertPriceCache(symbol, live, now)
+                    // Smaller limits = less traffic (still enough for indicators)
+                    val c15 = binance.getCandles(symbol, "15m", 220)
+                    val c1h = binance.getCandles(symbol, "1h", 160)
+                    val c4h = binance.getCandles(symbol, "4h", 160)
 
-                val c15 = binance.getCandles(symbol, "15m", 500)
-                val c1h = binance.getCandles(symbol, "1h", 300)
-                val c4h = binance.getCandles(symbol, "4h", 300)
-
-                val sig = engine.generate(symbol, c15, c1h, c4h, live, params) ?: continue
+                    val sig = engine.generate(symbol, c15, c1h, c4h, live, params) ?: continue
 
                 repo.insertSignalAndTrade(
                     signal = SignalEntity(
@@ -74,12 +76,17 @@ class SignalScanWorker(
                     )
                 )
 
-                notifier.notifySignal(
-                    title = "توصية ${sig.symbol} (${sig.side}) • Score ${sig.score}",
-                    body = "Entry ${fmt(sig.entry)} | SL ${fmt(sig.sl)} | TP1 ${fmt(sig.tp1)} | TP2 ${fmt(sig.tp2)}\n\nإخلاء مسؤولية: ليست نصيحة مالية."
-                )
+                    val sideAr = if (sig.side == "LONG") "شراء (Long)" else "بيع (Short)"
+                    notifier.notifySignal(
+                        title = "إشارة تحليل ${sig.symbol} • $sideAr • درجة ${sig.score}",
+                        body = "الدخول: ${fmt(sig.entry)}\nوقف الخسارة: ${fmt(sig.sl)}\nالأهداف: ${fmt(sig.tp1)} / ${fmt(sig.tp2)}\n\nالسبب: ${sig.reason}\n\nتنبيه: هذه معلومات تحليلية لأغراض تعليمية فقط وليست نصيحة استثمارية."
+                    )
 
-                graph.tradeMonitorScheduler.kick()
+                    graph.tradeMonitorScheduler.kick()
+                } catch (_: Exception) {
+                    // Skip this symbol and continue (avoid full failure)
+                    continue
+                }
             }
 
             Result.success()

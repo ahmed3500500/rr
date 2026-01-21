@@ -51,12 +51,13 @@ class StrategyEngine {
         var score = 0
         val reasons = mutableListOf<String>()
 
-        if (trendUp || trendDown) { score += 25; reasons += "Trend OK" }
-        if (abs(fast - slow) / livePrice > 0.001) { score += 15; reasons += "EMA separation" }
-        if (volRatio >= params.volumeFilterMinRatio) { score += 15; reasons += "Volume OK" }
-        if (atrRatio <= params.shockMaxAtrRatio) { score += 10; reasons += "No shock" }
-        if (rsi in 45.0..65.0) { score += 10; reasons += "RSI healthy" }
-        if (longTrigger || shortTrigger) { score += 25; reasons += "Trigger" }
+        // Arabic reasons (to keep UI + notifications fully Arabic)
+        if (trendUp || trendDown) { score += 25; reasons += "الاتجاه العام مناسب" }
+        if (abs(fast - slow) / livePrice > 0.001) { score += 15; reasons += "فرق المتوسطات واضح" }
+        if (volRatio >= params.volumeFilterMinRatio) { score += 15; reasons += "سيولة/حجم تداول جيد" }
+        if (atrRatio <= params.shockMaxAtrRatio) { score += 10; reasons += "بدون صدمة تقلب" }
+        if (rsi in 45.0..65.0) { score += 10; reasons += "RSI متوازن" }
+        if (longTrigger || shortTrigger) { score += 25; reasons += "تحقق شرط الدخول" }
 
         score = score.coerceIn(0, 100)
         if (score < params.minScore) return null

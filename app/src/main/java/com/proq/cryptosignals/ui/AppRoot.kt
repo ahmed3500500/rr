@@ -8,6 +8,7 @@ import com.proq.cryptosignals.ui.screens.BacktestScreen
 import com.proq.cryptosignals.ui.screens.DashboardScreen
 import com.proq.cryptosignals.ui.screens.SettingsScreen
 import com.proq.cryptosignals.ui.screens.SignalsScreen
+import com.proq.cryptosignals.ui.screens.WinnersScreen
 
 @Composable
 fun AppRoot() {
@@ -17,11 +18,13 @@ fun AppRoot() {
             DashboardScreen(
                 onOpenSignals = { nav.navigate("signals") },
                 onOpenSettings = { nav.navigate("settings") },
-                onOpenBacktest = { nav.navigate("backtest") }
+                onOpenBacktest = { nav.navigate("backtest") },
+                onOpenWinners = { nav.navigate("winners") }
             )
         }
         composable("signals") { SignalsScreen(onBack = { nav.popBackStack() }) }
         composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
         composable("backtest") { BacktestScreen(onBack = { nav.popBackStack() }) }
+        composable("winners") { WinnersScreen(onBack = { nav.popBackStack() }) }
     }
 }

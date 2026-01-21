@@ -15,7 +15,7 @@ fun LiveBadge(isLive: Boolean, ageSeconds: Long) {
     val shape = RoundedCornerShape(999.dp)
     val bg = if (isLive) Color(0xFF0AD47A).copy(alpha = 0.18f) else Color(0xFFFFB020).copy(alpha = 0.18f)
     val fg = if (isLive) Color(0xFF74FFC1) else Color(0xFFFFD58A)
-    val text = if (isLive) "LIVE" else "DELAYED ${ageSeconds}s"
+    val text = if (isLive) "مباشر" else "متأخر ${ageSeconds}ث"
     Text(
         text = text,
         color = fg,

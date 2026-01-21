@@ -18,6 +18,7 @@ data class UiSignal(
     val tp1: String,
     val tp2: String,
     val score: Int,
+    val reason: String,
     val isLive: Boolean,
     val priceAgeSeconds: Long
 )
@@ -47,11 +48,14 @@ class SignalRepository(
                     tp1 = s.tp1.format(6),
                     tp2 = s.tp2.format(6),
                     score = s.score,
+                    reason = s.reason,
                     isLive = s.priceIsLive && (now - s.priceAsOfMs) <= 15_000,
                     priceAgeSeconds = ((now - s.priceAsOfMs) / 1000).coerceAtLeast(0)
                 )
             }
         }
+
+    fun successfulTradesFlow() = tradeDao.flowSuccessfulClosedTrades()
 
     suspend fun insertSignalAndTrade(signal: SignalEntity, trade: TradeEntity): Long {
         val id = signalDao.insert(signal)

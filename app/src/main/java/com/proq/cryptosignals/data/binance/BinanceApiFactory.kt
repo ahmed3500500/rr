@@ -15,6 +15,13 @@ object BinanceApiFactory {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(15, TimeUnit.SECONDS)
             .writeTimeout(15, TimeUnit.SECONDS)
+            .addInterceptor { chain ->
+                val req = chain.request().newBuilder()
+                    // Friendly UA (helps avoid some overly strict WAF rules)
+                    .header("User-Agent", "CryptoSignalsNoServer/1.1 (Android)")
+                    .build()
+                chain.proceed(req)
+            }
             .addInterceptor(logging)
             .build()
 

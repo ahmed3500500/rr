@@ -52,10 +52,15 @@ fun SignalsScreen(onBack: () -> Unit) {
                                 Spacer(Modifier.weight(1f))
                                 LiveBadge(isLive = s.isLive, ageSeconds = s.priceAgeSeconds)
                             }
-                            Text("إتجاه: ${s.side} | Score: ${s.score}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f))
-                            Text("Entry: ${s.entryPrice} | SL: ${s.sl} | TP1: ${s.tp1} | TP2: ${s.tp2}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f))
+                            val sideAr = if (s.side == "LONG") "شراء (Long)" else "بيع (Short)"
+                            Text("الاتجاه: $sideAr • الدرجة: ${s.score}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f))
+                            Text("نقطة الدخول: ${s.entryPrice} • وقف الخسارة: ${s.sl}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f))
+                            Text("هدف 1: ${s.tp1} • هدف 2: ${s.tp2}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f))
+                            if (s.reason.isNotBlank()) {
+                                Text("سبب الإشارة: ${s.reason}", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f), style = MaterialTheme.typography.bodySmall)
+                            }
                             Text(
-                                "إخلاء مسؤولية: ليست نصيحة مالية. استخدم إدارة مخاطر ولا تدخل بأموال لا تتحمل خسارتها.",
+                                "إخلاء مسؤولية: هذه معلومات تحليلية لأغراض تعليمية فقط وليست توصية استثمارية. استخدم إدارة مخاطر ولا تدخل بأموال لا تتحمل خسارتها.",
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
                                 style = MaterialTheme.typography.bodySmall
                             )
